@@ -6,23 +6,22 @@
 部署本项目还是需要有一定的服务器知识，不是一个前台小姐姐就能搞的定。
 
 
+![主界面](https://github.com/aoktian/noname/blob/master/tools/info.png)
 
 
-# 基本配置在 ./config 目录下
+## 基本配置在 ./config 目录下
 
 
 
-# 初始化数据表，可以通过导入sql文件来完成，包括了一点儿基本数据，在目录 tools 下
--
+## 初始化数据表，可以通过导入sql文件来完成，包括了一点儿基本数据，在目录 tools 下
 ```shell
 sh tools/create.sh
 ```
 
-# nginx root目录配置到 public
+## nginx root目录配置到 public
 
 
-# 改 nginx 的 location 配置
--
+## 改 nginx 的 location 配置
 ```shell
 location / {
     try_files $uri $uri/ /index.php?$query_string;
@@ -30,7 +29,7 @@ location / {
 }
 ```
 
-# 我的服务器安装脚本，仅供参考，具体环境根据自己的需求配置
+## 我的服务器安装脚本，仅供参考，具体环境根据自己的需求配置
 ```shell
 yum -y install wget net-tools
 yum -y install gcc gcc-c++ autoconf automake libtool make cmake
@@ -81,5 +80,5 @@ chkconfig php-fpm on
 service php-fpm start
 ```
 
-# 我的邮箱
+## 我的邮箱
 email: aoktian@foxmail.com
