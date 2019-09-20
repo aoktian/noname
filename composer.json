@@ -1,0 +1,24 @@
+{
+    "require": {
+        "league/plates": "~3.3",
+        "workerman/mysql": "~1.0",
+        "aura/session": "~2.1",
+        "yurunsoft/yurun-lock": "^0.4.0",
+        "rakit/validation": "^1.1",
+        "mobiledetect/mobiledetectlib": "^2.8"
+    },
+    "autoload":{
+        "files": ["app/helper.php"],
+        "psr-4" : {
+            "I\\" : "app/",
+            "M\\" : "middle/",
+            "C\\" : "config/"
+        }
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.laravel-china.org"
+        }
+    }
+}
