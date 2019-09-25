@@ -11,6 +11,9 @@
 
 ![主界面](https://github.com/aoktian/noname/blob/master/tools/info.png)
 
+
+![进度](https://github.com/aoktian/noname/blob/master/tools/info2.png)
+
 # 如何使用我
 团队的工作助手，100人以内的团队使用完全没有问题。
 

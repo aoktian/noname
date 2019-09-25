@@ -73,7 +73,7 @@
 
 <div class="input-group ml-2">
 <select onchange="topage( 1 );" itag="val" name="orderby" class="form-control">
-<option value="updated_at desc">排序</option>
+<option value="">排序</option>
 <?php $this->insert('selection', ['data' => ['updated_at desc' => '修改时间', 'deadline' => '限期时间', 'created_at' => '创建时间'], 'slt' => $orderby])?>
 </select>
 </div>

@@ -103,17 +103,13 @@ class Controller extends Middle_Public {
         $perpage   = 20;
         $offset    = page_get_start($curpage, $perpage, $totalnum);
 
-        $sql .= ' order by status';
-        $sql .= ', priority desc';
-        $sql .= ', tag';
         $orderby = getgpc('orderby');
         if ($orderby) {
-            if ('updated_at' == $orderby) {
-                $sql .= ', updated_at desc';
-            } elseif ('deadline' == $orderby) {
-                $sql .= ', deadline';
-            }
+            $sql .= ' order by updated_at desc';
         } else {
+            $sql .= ' order by status';
+            $sql .= ', priority desc';
+            $sql .= ', tag';
             $sql .= ', updated_at desc';
             $orderby = '';
         }
