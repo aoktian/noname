@@ -102,6 +102,9 @@
 sh tools/create.sh
 ```
 
+### 基本配置在 ./config 目录下
+默认帐号 abc@abc.com 密码 123456
+
 ### nginx root目录需要配置到 public
 
 
