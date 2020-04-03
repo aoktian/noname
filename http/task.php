@@ -105,12 +105,12 @@ class Controller extends Middle_Public {
 
         $orderby = getgpc('orderby');
         if ($orderby) {
-            $sql .= ' order by updated_at desc';
+            $sql .= ' order by ' . $orderby;
         } else {
             $sql .= ' order by status';
             $sql .= ', priority desc';
             $sql .= ', tag';
-            $sql .= ', updated_at desc';
+            $sql .= ', deadline';
             $orderby = '';
         }
 

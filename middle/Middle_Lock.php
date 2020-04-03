@@ -2,6 +2,7 @@
 namespace M;
 use I\Proxy;
 use I\Singleton;
+use I\Table;
 
 class Middle_Lock extends Singleton {
     private $locks = [];
@@ -42,5 +43,10 @@ class Middle_Lock extends Singleton {
 
     public function user($id) {
         $this->start('user_' . $id);
+    }
+
+    public function getuser($id) {
+        $this->start('user_' . $id);
+        retrurn Table::singleton(Table::USERS)->find($id);
     }
 }
