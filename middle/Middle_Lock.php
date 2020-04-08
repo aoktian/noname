@@ -47,6 +47,6 @@ class Middle_Lock extends Singleton {
 
     public function getuser($id) {
         $this->start('user_' . $id);
-        retrurn Table::singleton(Table::USERS)->find($id);
+        return Table::singleton(Table::USERS)->find($id);
     }
 }

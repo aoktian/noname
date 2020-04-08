@@ -310,7 +310,7 @@ $this->insert('selection-users', ['data' => $departments, 'slt' => $tester->depa
 <td class="left"> <?=$log->title?> </td>
 <td>
 <?php if ($log->content): ?>
-<a href="javascript:diff( 'task', <?=$log->id?>, <?=$task->id?>, 'taskcontent' );" class="" target="_blank">和当前对比</a>
+<a href="javascript:diff( 'task', <?=$log->id?>, <?=$task->id?>, 'taskcontent' );">和当前对比</a>
 <?php endif?></td>
 <td> <?=$log->department?> </td>
 <td> <?=$log->tester?> </td>

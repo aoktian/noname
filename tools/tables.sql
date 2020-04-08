@@ -3,7 +3,6 @@ CREATE TABLE IF NOT EXISTS `users` (
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
-  `attempts` int(10) NOT NULL,
   `department` int(4) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
@@ -28,6 +27,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `created_at` timestamp,
   `updated_at` timestamp,
   `related` int(11) NOT NULL DEFAULT '0',
+  `r` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `task_related_index` (`related`)
 ) ENGINE=MyISAM AUTO_INCREMENT=10000 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
