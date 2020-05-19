@@ -89,13 +89,27 @@
 + 每个人的任务都是基于任务列表，每天的第一件事一定是打开自己的任务（这个是需要给来的人强调的），对每个任务要有一个评估，比如有a,b,c三个任务，是先做a，还是先做b，这个取决于每个人对自己和对整个项目的认识
 + 任务的状态，这个也是需要给新人讲解的，因为任务状态规范了开发流程
 
+# 安装配置
 
+## 使用 Docker Compose
 
-## 安装配置
+我们推荐使用 Docker Compose 部署本项目. 首先确保你的机器上已经安装好了 Docker 和 Docker Compose.
+
+执行如下命令创建并运行容器:
+
+```bash
+git clone https://github.com/aoktian/noname.git
+cd noname
+docker-compose up -d
+```
+
+然后用你的浏览器打开 `http://your_host/install` 以初始化数据库. 若出现 `PDOException: SQLSTATE[HY000] [2002] Connection refused in /var/www/vendor/workerman/mysql/src/Connection.php:1609` 这样的报错说明数据库正在初始化, 稍后重试即可.
+
+初始账号为 `abc@abc.com`, 密码为 `123456`.
+
+## 直接安装
 
 ### 基本配置在 ./config 目录下
-
-
 
 ### 初始化数据表，可以通过导入sql文件来完成，包括了一点儿基本数据，在目录 tools 下
 ```shell
