@@ -3,6 +3,10 @@ use I\Table;
 use M\Middle_Public;
 
 class Controller extends Middle_Public {
+
+    public function checkAuth() {
+    }
+
     public function index() {
         return $this->view->redirect('/task/ido');
     }

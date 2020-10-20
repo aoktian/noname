@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(60) COLLATE utf8_unicode_ci NOT NULL,
   `department` int(4) NOT NULL DEFAULT '1',
+  `team` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=MyISAM AUTO_INCREMENT=100 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -14,6 +15,7 @@ CREATE TABLE IF NOT EXISTS `tasks` (
   `content` text COLLATE utf8_unicode_ci NOT NULL,
   `caty` smallint(6) NOT NULL DEFAULT '1',
   `priority` smallint(6) NOT NULL DEFAULT '1',
+  `level` int NOT NULL DEFAULT '0',
   `department` smallint(6) NOT NULL DEFAULT '1',
   `status` smallint(6) NOT NULL DEFAULT '1',
   `tag` int(11) NOT NULL DEFAULT '1',
@@ -39,6 +41,7 @@ CREATE TABLE IF NOT EXISTS `tasklogs` (
   `content` text COLLATE utf8_unicode_ci NOT NULL,
   `caty` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `priority` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `level` int NOT NULL DEFAULT '0',
   `department` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `status` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `tag` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -96,6 +99,7 @@ CREATE TABLE IF NOT EXISTS `titles` (
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `caty` tinyint(4) NOT NULL,
   `locked` tinyint(4) NOT NULL DEFAULT '0',
+  `r` int NOT NULL DEFAULT 0,
   `created_at` timestamp,
   `updated_at` timestamp,
   PRIMARY KEY (`id`),
@@ -127,6 +131,7 @@ CREATE TABLE IF NOT EXISTS `golist_taskgs` (
 CREATE TABLE IF NOT EXISTS `golist_mod` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(200) COLLATE utf8_unicode_ci NOT NULL,
+  `caty` tinyint NOT NULL default 1,
   `gid` int(10) NOT NULL,
   `r` int(10) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),

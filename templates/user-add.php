@@ -22,7 +22,7 @@
 <div class="input-group-prepend">
 <span class="input-group-text">EMAIL</span>
 </div>
-<input value="<?=$user->email?>" name="udata[email]" value="" type="email" class="form-control">
+<input value="<?=$user->email?>" name="udata[email]" type="email" class="form-control">
 </div>
 
 <div class="input-group mb-3">
@@ -32,6 +32,13 @@
 <select name="udata[department]" class="form-control">
 <?php $this->insert('selection-users', ['data' => $departments, 'slt' => $user->department])?>
 </select>
+</div>
+
+<div class="input-group mb-3">
+<div class="input-group-prepend">
+<span class="input-group-text">分组</span>
+</div>
+<input value="<?=$user->team?>" name="udata[team]" type="number" class="form-control">
 </div>
 
 <div class="input-group mb-3">

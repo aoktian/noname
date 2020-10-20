@@ -2,7 +2,6 @@
 namespace M;
 use I\Proxy;
 use I\Singleton;
-use I\Table;
 
 class Middle_Lock extends Singleton {
     private $locks = [];

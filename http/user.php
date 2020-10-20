@@ -7,7 +7,7 @@ use M\Middle_Public;
 class Controller extends Middle_Public {
     public function index() {
         $db          = DB::write();
-        $users       = $db->query('select id, email, name, department from users order by department');
+        $users       = $db->query('select id, email, name, department, team from users order by team');
         $departments = $db->query('select * from titles where caty = ' . Config_Wt::department);
 
         $this->view->html('users', [
@@ -55,6 +55,7 @@ class Controller extends Middle_Public {
                     'name'       => '',
                     'email'      => '',
                     'department' => 0,
+                    'team'       => 0,
                 ];
             } else {
                 $user = Table::singleton('users')->find($id);

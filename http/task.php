@@ -23,7 +23,7 @@ class Controller extends Middle_Public {
     }
 
     private function getSortedusers() {
-        $users     = DB::keyBy("select id, name, department from users");
+        return DB::keyBy("select id, name, department, team from users order by team");
         $sortusers = array();
         foreach ($users as $k => $v) {
             $sortusers[$k] = iconv('UTF-8', 'GBK', $v->name);
@@ -40,25 +40,37 @@ class Controller extends Middle_Public {
         $db  = DB::write();
         $ids = getgpc('ids');
         if ($ids) {
-            $updates = array();
-            foreach (getgpc('changeto') as $key => $value) {
-                if ($value > 0) {
-                    $updates[$key] = $value;
+            $updates  = array();
+            $changeto = getgpc('changeto');
+            if ($changeto) {
+                if (isset($changeto['deadline'])) {
+                    $changeto['deadline'] = strtotime($changeto['deadline']);
+                }
+                foreach ($changeto as $key => $value) {
+                    if ($value > 0) {
+                        $updates[$key] = $value;
+                    }
                 }
             }
 
             if (isset($updates['tag'])) {
-                $tag            = $db->row('select * from tags where id = ' . $updates['tag']);
+                $tag            = $this->get_tag($updates['tag']);
                 $updates['pro'] = $tag->pro;
             }
             if (isset($updates['leader'])) {
-                $leader                = $db->row('select * from users where id = ' . $updates['leader']);
+                $leader                = $this->get_user($updates['leader']);
                 $updates['department'] = $leader->department;
             }
 
             if ($updates) {
+                $ids_s                 = implode(',', $ids);
                 $updates['updated_at'] = date('Y-m-d H:i:s');
-                $db->update('tasks')->cols($updates)->where('ID in(' . implode(',', $ids) . ')')->query();
+
+                $changed_tasks = $db->query('select * from tasks where id in (' . $ids_s . ')');
+                foreach ($changed_tasks as $key => $value) {
+                    $this->addlog($value, $updates);
+                }
+                $db->update('tasks')->cols($updates)->where('ID in(' . $ids_s . ')')->query();
             }
         }
 
@@ -68,9 +80,16 @@ class Controller extends Middle_Public {
             $search = array();
         }
 
-        $search = array_merge($search, $searchargs);
+        $search  = array_merge($search, $searchargs);
+        $orderby = getgpc('orderby', '');
 
         $where = array();
+
+        if ($orderby == 'deadline') {
+            unset($search['status']);
+            $where[] = 'status<30';
+        }
+
         foreach ($search as $key => $value) {
             if ($value > 0) {
                 $options[$key] = $value;
@@ -103,14 +122,14 @@ class Controller extends Middle_Public {
         $perpage   = 20;
         $offset    = page_get_start($curpage, $perpage, $totalnum);
 
-        $orderby = getgpc('orderby');
         if ($orderby) {
             $sql .= ' order by ' . $orderby;
         } else {
             $sql .= ' order by status';
+            $sql .= ', tag desc';
             $sql .= ', priority desc';
-            $sql .= ', tag';
-            $sql .= ', deadline';
+            $sql .= ', level';
+            $sql .= ', updated_at desc';
             $orderby = '';
         }
 
@@ -122,15 +141,20 @@ class Controller extends Middle_Public {
             $tpl = 'task-list-content';
         }
 
+        $this->init_users();
+        $this->init_catys();
+        $this->init_departments();
+        $this->init_pros();
+        $this->init_tags();
         $this->view->addData([
             'tasks'       => $tasks,
-            'pros'        => DB::keyBy("select * from pros"),
-            'users'       => $this->getSortedusers(),
-            'tags'        => DB::keyBy("select id, name, pro from tags order by id desc"),
+            'pros'        => $this->pros,
+            'users'       => $this->users,
+            'tags'        => $this->tags,
             'status'      => App::singleton()->getconfig('worktime', 'status'),
             'prioritys'   => App::singleton()->getconfig('worktime', 'priority'),
-            'catys'       => DB::keyBy("select * from titles where caty = " . App::singleton()->getconfig('worktime', 'caty')),
-            'departments' => DB::keyBy("select * from titles where caty = " . App::singleton()->getconfig('worktime', 'department')),
+            'catys'       => $this->catys,
+            'departments' => $this->departments,
             'options'     => $options,
             'orderby'     => $orderby,
             'ismain'      => $ismain,
@@ -157,15 +181,20 @@ class Controller extends Middle_Public {
             $related = NULL;
         }
 
+        $this->init_users();
+        $this->init_catys();
+        $this->init_departments();
+        $this->init_pros();
+        $this->init_tags();
         return $this->view->html('task-commit', [
             'task'        => $task,
             'related'     => $related,
-            'pros'        => DB::keyBy("select * from pros"),
-            'users'       => $this->getSortedusers(),
-            'tags'        => DB::keyBy("select id, name, pro from tags order by id desc"),
+            'pros'        => $this->pros,
+            'users'       => $this->users,
+            'tags'        => $this->tags,
             'status'      => App::singleton()->getconfig('worktime', 'status'),
-            'catys'       => DB::keyBy("select * from titles where caty = " . App::singleton()->getconfig('worktime', 'caty')),
-            'departments' => DB::keyBy("select * from titles where caty = " . App::singleton()->getconfig('worktime', 'department')),
+            'catys'       => $this->catys,
+            'departments' => $this->departments,
         ]);
     }
 
@@ -210,6 +239,10 @@ class Controller extends Middle_Public {
             $this->addlog($task, $row);
             $db->update('tasks')->cols($row)->where('id=' . $id)->query();
         } else {
+            if (!isset($row['tag'])) {
+                return;
+            }
+
             $row['created_at'] = $now;
             $id                = $db->insert('tasks')->cols($row)->query();
         }
@@ -222,12 +255,70 @@ class Controller extends Middle_Public {
         }
     }
 
+    private $catys = NULL;
+    private function init_catys() {
+        if (!$this->catys) {
+            $this->catys = DB::keyBy("select * from titles where caty = " . App::singleton()->getconfig('worktime', 'caty'));
+        }
+    }
+
+    private function get_caty($id) {
+        $this->init_catys();
+        return $this->catys[$id];
+    }
+
+    private $tags = NULL;
+    private function init_tags() {
+        if (!$this->tags) {
+            $this->tags = DB::keyBy('select id, name, pro from tags');
+        }
+    }
+    private function get_tag($id) {
+        $this->init_tags();
+        return $this->tags[$id];
+    }
+
+    private $pros = NULL;
+    private function init_pros() {
+        if (!$this->pros) {
+            $this->pros = DB::keyBy('select * from pros');
+        }
+    }
+    private function get_pro($id) {
+        $this->init_pros();
+        return $this->pros[$id];
+    }
+
+    private $departments = NULL;
+    private function init_departments() {
+        if (!$this->departments) {
+            $this->departments = DB::keyBy('select * from titles where caty = ' . App::singleton()->getconfig('worktime', 'department') . ' order by r ');
+        }
+    }
+
+    private function get_department($id) {
+        $this->init_departments();
+        return $this->departments[$id];
+    }
+
+    private $users = NULL;
+    private function init_users() {
+        if (!$this->users) {
+            $this->users = DB::keyBy("select id, name, department, team from users order by team");
+        }
+    }
+
+    private function get_user($id) {
+        $this->init_users();
+        return $this->users[$id];
+    }
+
     private function addlog($old, $update) {
         $monitor = array(
             'title', 'content', 'caty',
             'priority', 'department', 'status',
             'tag', 'pro', 'deadline',
-            'changer', 'leader', 'tester',
+            'changer', 'leader', 'tester', 'level',
         );
         $changed = array();
         foreach ($monitor as $col) {
@@ -241,34 +332,36 @@ class Controller extends Middle_Public {
         }
 
         if (isset($changed['caty'])) {
-            $row             = DB::find('titles', $changed['caty']);
+            $row             = $this->get_caty($update['caty']);
             $changed['caty'] = $row->name;
         }
         if (isset($changed['department'])) {
-            $row                   = DB::find('titles', $changed['department']);
+            $row                   = $this->get_department($update['department']);
             $changed['department'] = $row->name;
         }
 
         if (isset($changed['priority'])) {
-            $changed['priority'] = App::singleton()->getconfig('worktime', 'priority')[$changed['priority']];
+            $prioritys           = App::singleton()->getconfig('worktime', 'priority');
+            $changed['priority'] = $prioritys[$update['priority']];
         }
         if (isset($changed['status'])) {
-            $changed['status'] = App::singleton()->getconfig('worktime', 'status')[$changed['status']];
+            $status            = App::singleton()->getconfig('worktime', 'status');
+            $changed['status'] = $status[$update['status']];
         }
 
         if (isset($changed['tag'])) {
-            $row            = DB::find('tags', $changed['tag']);
+            $row            = $this->get_tag($update['tag']);
             $changed['tag'] = $row->name;
         }
 
         if (isset($changed['pro'])) {
-            $row            = DB::find('pros', $changed['pro']);
+            $row            = $this->get_pro($update['pro']);
             $changed['pro'] = $row->name;
         }
 
         foreach (['author', 'leader', 'tester', 'changer'] as $col) {
             if (isset($changed[$col])) {
-                $row           = DB::find('users', $changed[$col]);
+                $row           = $this->get_user($update[$col]);
                 $changed[$col] = $row->name;
             }
         }
@@ -307,21 +400,26 @@ class Controller extends Middle_Public {
             }
         }
 
+        $this->init_users();
+        $this->init_catys();
+        $this->init_departments();
+        $this->init_pros();
+        $this->init_tags();
         $this->view->addData([
             'task'        => $task,
             'parent_task' => $parent_task,
             'tasks'       => $db->query($relatedsql),
-            'feedbacks'   => $db->query("select * from feedbacks where pid=$id"),
-            'users'       => $this->getSortedusers(),
+            'feedbacks'   => $db->query("select * from feedbacks where pid=$id limit 10"),
+            'users'       => $this->users,
             'prioritys'   => App::singleton()->getconfig('worktime', 'priority'),
-            'tags'        => DB::keyBy('select id, name, pro from tags'),
-            'pros'        => DB::keyBy('select * from pros'),
-            'catys'       => DB::keyBy("select * from titles where caty = " . App::singleton()->getconfig('worktime', 'caty')),
-            'departments' => DB::keyBy("select * from titles where caty = " . App::singleton()->getconfig('worktime', 'department')),
+            'tags'        => $this->tags,
+            'pros'        => $this->pros,
+            'catys'       => $this->catys,
+            'departments' => $this->departments,
         ]);
 
         return $this->view->html('task-show', [
-            'logs' => $db->query("select * from tasklogs where pid=$id"),
+            'logs' => $db->query("select * from tasklogs where pid=$id order by created_at desc limit 5"),
         ]);
     }
 
@@ -336,6 +434,15 @@ class Controller extends Middle_Public {
         }
         if ($related == $id) {
             $this->view->assertAlert('自己不能关联自己');
+        }
+
+        $child = $db->row('select * from tasks where id=' . $related);
+        if (!$child) {
+            $this->view->assertAlert('子任务不存在');
+        }
+        $is_main = $db->row('select * from tasks where related=' . $related . ' limit 1');
+        if ($is_main) {
+            $this->view->assertAlert('子任务现在是主任务');
         }
 
         $udata = [

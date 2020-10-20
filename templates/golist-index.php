@@ -37,7 +37,7 @@ for ($i = 0; $i < 2; $i++) {
         ?>
 
 
-<table data-caty="<?=$mod->caty?>" class="table table-sm table-bordered table-striped tmiddle tcenter">
+<table data-caty="<?=$mod->caty?>" class="table table-sm table-bordered table-striped tmiddle tcenter mfont">
 <tbody>
 <tr class="table-primary">
 <th width="150">

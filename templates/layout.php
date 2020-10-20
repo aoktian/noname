@@ -128,14 +128,14 @@ class="btn btn-default<?=($ctl == CONTROLLER ? ' btn-success' : '')?>">
 <div class="form-inline">
 
 <div class="input-group ml-2">
-<input id="gid" type="text" class="form-control" placeholder="输入编号直接打开">
+<input id="gid" type="text" class="form-control" placeholder="输入编号直接打开" onkeydown="go2id(event)" >
 <div class="input-group-append">
 <button onclick="window.open( '/task/show/' + $('#gid').val() );" class="btn btn-outline-secondary" type="button">Go!</button>
 </div>
 </div>
 
 <div class="input-group ml-2">
-<input id="stitle" type="text" class="form-control" placeholder="标题模糊查询">
+<input id="stitle" type="text" class="form-control" placeholder="标题模糊查询" onkeydown="go2title(event)">
 <div class="input-group-append">
 <button onclick="getlist( 'title=' + $('#stitle').val() );" class="btn btn-outline-secondary" type="button">Search</button>
 </div>
@@ -153,7 +153,7 @@ class="btn btn-default<?=($ctl == CONTROLLER ? ' btn-success' : '')?>">
 
 
 <div class="col-md-2" style="text-align: right;">
-<strong style="height:48px; line-height: 48px;font-size: 25px;"><?=C\Config_App::name?></strong>
+<strong style="height:48px; line-height: 48px;font-size: 25px;">AI Work</strong>
 </div>
 
 </div>
@@ -320,6 +320,21 @@ function mainmenu(t, path, active) {
     o.addClass(active)
     ajax(path)
 }
+
+function go2id(e) {
+    var keycode = e.which
+    if (keycode == 13 ) {
+        window.open( '/task/show/' + $('#gid').val() );
+    }
+}
+
+function go2title(e) {
+    var keycode = e.which
+    if (keycode == 13 ) {
+        getlist( 'title=' + $('#stitle').val() );
+    }
+}
+
 </script>
 <?=$this->section('script')?>
 

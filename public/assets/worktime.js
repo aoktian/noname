@@ -70,11 +70,18 @@ String.prototype.format = function (args) {
 };
 
 function getUsers( id ) {
-    var options = "";
+    var a = [];
     for (var i in users) {
         if (users[i].department == id) {
-            options += "<option value='" + users[i].id + "'>" + users[i].name + "</option>";
+            a.push(users[i]);
         }
+    }
+
+    a.sort(function(x, y){return x.team - y.team});
+
+    var options = "";
+    for (var i = 0; i < a.length; i++) {
+        options += "<option value='" + a[i].id + "'>" + a[i].name + "</option>";
     }
     return options;
 }
@@ -266,9 +273,11 @@ function changeMore( ) {
             changed = true;
         }
     }
-    if (!changed) {
-        alert( "没有变化" );
-        return;
+
+    var deadline = $("#change_more_deadline").val()
+    if (deadline) {
+        $("#change_more_deadline").val("")
+        s += "&changeto[deadline]=" + deadline;
     }
 
     s += "&title=" + $("#stitle").val();

@@ -37,6 +37,7 @@ $titlecatys = I\App::singleton()->getconfig('worktime', 'title');
 <tr>
 <th width="50">#id</th>
 <th width="150"> 名称 </th>
+<th width="150"> 排序 </th>
 <th width="150"> 类型 </th>
 <th> 操作 </th>
 </tr>
@@ -50,6 +51,9 @@ $titlecatys = I\App::singleton()->getconfig('worktime', 'title');
 <td><?=$title->id?></td>
 <td>
 <input type="text" class="form-control" name="row[name]" value="<?=$title->name?>">
+</td>
+<td>
+<input type="text" class="form-control" name="row[r]" value="<?=$title->r?>">
 </td>
 <td>
 <?php if ($title->locked): ?>

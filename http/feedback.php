@@ -14,7 +14,6 @@ class Controller extends Middle_Public {
         $id  = getgpc('id');
         $row = getgpc('row');
 
-        $row['author']  = $this->authed->id;
         $row['changer'] = $this->authed->id;
 
         $now               = date('Y-m-d H:i:s');
@@ -29,6 +28,7 @@ class Controller extends Middle_Public {
             $this->addlog($id, $row);
             $db->update('feedbacks')->cols($row)->where('id=' . $id)->query();
         } else {
+            $row['author']     = $this->authed->id;
             $row['created_at'] = $now;
             $id                = $db->insert('feedbacks')->cols($row)->query();
         }

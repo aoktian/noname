@@ -6,10 +6,6 @@
 
 <?php if ($task->related): ?>
 
-<button data-toggle="collapse" href="#related-list" class="btn btn-secondary" type="button">
-<i class="fas fa-angle-double-down"></i>
-</button>
-
 <span class="badge badge-warning">主任务</span>
 <a href="/task/show/<?=$parent_task->id?>">#<?=$parent_task->id?> <?=$parent_task->title?></a>
 
@@ -27,21 +23,19 @@
 </div>
 
 <a href="/task/create/0/<?=$task->id?>" target="_blank" class="btn btn-success ml-2"><span class="glyphicon glyphicon-tasks"></span> 新增相关任务</a>
-
-<button data-toggle="collapse" href="#related-list" class="btn btn-secondary ml-2" type="button">
-<i class="fas fa-angle-double-down"></i>
-</button>
 </div>
 <?php endif?>
 
 </div>
 
 <?php if ($tasks): ?>
-<div class="card-body collapse" id="related-list">
+<div class="card-body" id="related-list">
 <table class="table table-striped tmiddle tcenter" id="tasklist-table">
 
 <thead>
 <tr>
+<th width="20">
+<input type="checkbox" onclick="checkall('tasklist', 'ids[]', $(this).prop('checked') );"></th>
 <th width="50">流程</th>
 <th width="180"> 版本 </th>
 <th> 状态 </th>
@@ -57,62 +51,21 @@
 </tr>
 </thead>
 <tbody id="tasklist">
-<?php
-$status = I\App::singleton()->getconfig('worktime', 'status');
-foreach ($tasks as $one) {
-    $tcolor = tr_color($one);
-    ?>
-<tr class="rlist <?=$tcolor?>">
-<td>
-
-<div class="btn-group" role="group">
-<button type="button" class="btn <?=($one->status == 98 ? 'btn-success' : 'btn-secondary')?> dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-<span class="oi oi-<?=($one->r > 0 ? 'arrow-thick-bottom' : 'minus')?>"></span>
-</button>
-<div class="dropdown-menu">
-<a class="dropdown-item" href="javascript:ajax('/task/related?related=<?=$one->id?>&id=0');">取消关联</a>
-<?php if ($one->r > 0): ?>
-<a class="dropdown-item" href="javascript:up(this, '/task/rrr/<?=$one->id?>?updown=up');">上移</a>
-<a class="dropdown-item" href="javascript:down(this, '/task/rrr/<?=$one->id?>?updown=down')"><a href="javascript:void(0);">下移</a>
-<a class="dropdown-item" href="javascript:ajax('/task/no_r/<?=$one->id?>');">取消流程</a>
-<?php else: ?>
-<a class="dropdown-item" href="javascript:ajax('/task/add_r/<?=$one->id?>');">加入流程</a>
-<?php endif?>
-</div>
-
-</div>
-
-</td>
-<td><?=isset($tags[$one->tag]) ? $tags[$one->tag]->name : ''?></td>
-<td><?=$status[$one->status]?></td>
-<td><?=isset($prioritys[$one->priority]) ? $prioritys[$one->priority] : ''?></td>
-<td><?=$catys[$one->caty]->name?></td>
-
-<td><?=getlast($one)?></td>
-
-<td class="left"><a class="<?=$tcolor?>" href="/task/show/<?=$one->id?>" target="_blank">#<?=$one->id?> <?=cutstr($one->title, 80)?></a></td>
-<td><?=$departments[$one->department]->name?></td>
-<td><?=$users[$one->leader]->name?></td>
-<td><?=isset($users[$one->tester]) ? $users[$one->tester]->name : '-'?></td>
-<td><?=date('Y-m-d H:i:s', $one->deadline)?></td>
-<td><?=$one->updated_at?></td>
-</tr>
-<?php }?>
+<?php $this->insert('task-list-content', ['related_op' => true])?>
 </tbody>
 
 </table>
 </div>
 
-<?php if (!$task->related): ?>
 <div class="card-footer">
 <div id="taskfilter">
+<input type="hidden" itag="val" name="is_related" value="true" >
 <input type="hidden" itag="val" name="perpage" value="100" >
-<input type="hidden" itag="val" name="search[related]" value="<?=$task->id?>" >
+<input type="hidden" itag="val" name="search[related]" value="<?=$task->related ? $task->related : $task->id?>" >
 </div>
 <input type="hidden" id="stitle">
 <?php $this->insert('task-changemore', ['show_clear_related' => true])?>
 </div>
-<?php endif?>
 
 <?php endif?>
 
@@ -163,11 +116,12 @@ foreach ($tasks as $one) {
 </div>
 
 <div class="input-group ml-2">
-<select itag="val" name="row[priority]" class="form-control">
+<select style="width:80px;" itag="val" name="row[priority]" class="form-control">
 <?php
 $prioritys = I\App::singleton()->getconfig('worktime', 'priority');
 $this->insert('selection', ['data' => $prioritys, 'slt' => $task->priority])?>
 </select>
+<input style="width:80px;" itag="val" name="row[level]" type="number" class="form-control" value="<?=$task->level?>">
 </div>
 
 <div class="input-group ml-2">
@@ -310,7 +264,7 @@ $this->insert('selection-users', ['data' => $departments, 'slt' => $tester->depa
 <td class="left"> <?=$log->title?> </td>
 <td>
 <?php if ($log->content): ?>
-<a href="javascript:diff( 'task', <?=$log->id?>, <?=$task->id?>, 'taskcontent' );">和当前对比</a>
+<a href="javascript:diff( 'task', <?=$log->id?>, <?=$task->id?>, 'taskcontent' );" class="" target="_blank">和当前对比</a>
 <?php endif?></td>
 <td> <?=$log->department?> </td>
 <td> <?=$log->tester?> </td>

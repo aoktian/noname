@@ -19,8 +19,8 @@ if ($total > 0) {
 ?>
 <td><?=$total?></td>
 <td><?=$newnum?></td>
-<td><?=$one[10] + $one[11] + $one[12]?></td>
-<td><?=$one[19]?></td>
+<td><?=$one[10] + $one[11] + $one[12] + $one[21] + $one[22] + $one[23] + $one[24] + $one[25]?></td>
+<td><?=$one[30]?></td>
 <td><?=$one[50]?></td>
 <td><?=$one[60]?></td>
 <td><?=$one[98]?></td>

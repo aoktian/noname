@@ -8,6 +8,7 @@ if (is_null($task)) {
     $task->title      = '没有标题的标题';
     $task->caty       = 0;
     $task->priority   = 0;
+    $task->level      = 0;
     $task->department = $authed->department;
     $task->leader     = $authed->id;
     $task->pro        = 0;
@@ -15,6 +16,14 @@ if (is_null($task)) {
     $task->tester     = $authed->id;
     $task->deadline   = 0;
     $task->content    = '';
+
+    if ($related) {
+        $task->title    = $related->title;
+        $task->level    = $related->level;
+        $task->pro      = $related->pro;
+        $task->tag      = $related->tag;
+        $task->priority = $related->priority;
+    }
 }
 ?>
 <h1><?=($related ? sprintf('上级任务：#%s %s', $related->id, $related->title) : '提交新任务')?></h1>
@@ -49,8 +58,9 @@ if (is_null($task)) {
 $prioritys = I\App::singleton()->getconfig('worktime', 'priority');
 $this->insert('selection', ['data' => $prioritys, 'slt' => $task->priority])?>
 </select>
+<input name="row[level]" type="number" style="width:100px" class="form-control" value="<?=$task->level?>">
 
-<select style="width: 100px;" onchange="slted_caty(this.value)" id="caty" name="row[caty]" class="form-control">
+<select style="width: 100px;" id="caty" name="row[caty]" class="form-control">
 <?php $this->insert('selection-users', ['data' => $catys, 'slt' => $task->caty])?>
 </select>
 
@@ -169,40 +179,18 @@ function oncommit( ) {
   return true;
 }
 
-var cehua = '<p><b>设计目的：</b></p></br>'
-cehua += '<p><b>用户感受：</b></p>'
-cehua += '<p><b><ul><li>平民：</li></ul></b></p>'
-cehua += '<p><b><ul><li>小R：</ul></li></b></p>'
-cehua += '<p><b><ul><li>中R：</ul></li></b></p>'
-cehua += '<p><b><ul><li>大R：</ul></li></b></p></br>'
-cehua += '<p><b>系统框架：</b></p></br>'
-cehua += '<p><b>详细需求：</b></p></br>'
-cehua += '<p><b>验收标准：</b></p></br>'
+var markupStr = '<p>问题描述：</p>'
+markupStr += '<p>重现环境：</p>'
+markupStr += '<p>版本信息：</p>'
+markupStr += '<p>重现步骤：</p>'
+markupStr += '<p>期望结果：</p>'
+markupStr += '<p>附件信息：</p>'
 $(document).ready(function() {
     if ($('#task-id').val() > 0) {
         return
     }
 
-    $('#summernote').summernote('code', cehua);
+    $('#summernote').summernote('code', markupStr);
 })
-function slted_caty(caty) {
-    if ($('#task-id').val() > 0) {
-        return
-    }
-    if (102 == caty) {
-        var markupStr = '<p>问题描述：</p>'
-        markupStr += '<p>重现环境：</p>'
-        markupStr += '<p>版本信息：</p>'
-        markupStr += '<p>重现步骤：</p>'
-        markupStr += '<p>期望结果：</p>'
-        markupStr += '<p>附件信息：</p>'
-        $('#summernote').summernote('code', markupStr);
-    } else if (100 == caty) {
-        $('#summernote').summernote('code', cehua);
-    } else {
-        $('#summernote').summernote('code', '');
-    }
-}
-
 </script>
 <?php $this->end()?>

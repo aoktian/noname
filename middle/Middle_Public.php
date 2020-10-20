@@ -14,9 +14,7 @@ class Middle_Public extends Singleton {
         $this->view = View::singleton();
         $this->r    = $this->view->r;
 
-        if ('index' != CONTROLLER) {
-            $this->checkAuth();
-        }
+        $this->checkAuth();
     }
 
     public function checkAuth() {
