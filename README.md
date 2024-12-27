@@ -9,11 +9,6 @@
 **部署本项目还是需要有一定的服务器知识，不是一个前台小姐姐就能搞的定。**
 
 
-![主界面](https://github.com/aoktian/noname/blob/master/tools/info.png)
-
-
-![进度](https://github.com/aoktian/noname/blob/master/tools/info2.png)
-
 # 如何使用我
 团队的工作助手，100人以内的团队使用完全没有问题。
 
